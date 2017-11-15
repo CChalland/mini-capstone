@@ -1,4 +1,8 @@
 require "unirest"
+require "tty-table"
+
+table = TTY:Table.new do |t|
+  t << 
 
 response = Unirest.get("http://localhost:3000/all_products_info")
 all_products = response.body
