@@ -7,5 +7,9 @@ Rails.application.routes.draw do
     get "/sholders" => "products#sholders_method"
     get "/elbows" => "products#elbows_method"
     get "/gloves" => "products#gloves_method"
+
+    get "/product/:input_product" => "products#product_method"
+    get "/products" => "products#index"
+    get "/products/:id" => "products#show" 
   end
 end
