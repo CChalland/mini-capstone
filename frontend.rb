@@ -1,33 +1,97 @@
+# require "unirest"
+# require "tty-prompt"
+
+
+# response = Unirest.get("http://localhost:3000/v1/all_products_info")
+# all_products = response.body
+
+# def print_info(input)
+#   system "clear"
+#   puts "Welcome to Cole's Hockey Store!!"
+
+#   i = 1
+#   input.each do |product|
+#     puts "#{i}. #{product["name"]}"
+#     i += 1
+#   end
+#   puts "Enter the number product to view product's full infomation."
+# end
+
+# while true
+#   print_info(all_products)
+#   temp = gets.chomp
+#   answer = temp.to_i - 1
+#   puts "#{temp}. #{all_products[answer]["name"]}"
+#   puts "    Image url: #{all_products[answer]["image"]}"
+#   puts "    Price: #{all_products[answer]["price"]}"
+#   puts "    Description: #{all_products[answer]["description"]}"
+#   puts "Enter 'Q' to quit the program or any other key to conutine."
+#   input_answer = gets.chomp
+#   if input_answer == 'Q'
+#     break
+#   end
+# end
+
 require "unirest"
-require "tty-table"
+require "pp"
 
+system "clear"
+puts "Welcome to the Hockey Store! Select an option:"
+puts "[1] See all the products"
+puts "[2] Create a new product"
+puts "[3] Show a particular item"
+puts "[4] Update the particular item"
+puts "[5] Delete the particular item"
 
-response = Unirest.get("http://localhost:3000/v1/all_products_info")
-all_products = response.body
+input_answer = gets.chomp
 
-def print_info(input)
-  system "clear"
-  puts "Welcome to Cole's Hockey Store!!"
+if input_answer == "1"
+  response = Unirest.get("http://localhost:3000/v1/products")
+  all_products = response.body
+  pp all_products
 
-  i = 1
-  input.each do |product|
-    puts "#{i}. #{product["name"]}"
-    i += 1
-  end
-  puts "Enter the number product to view product's full infomation."
-end
+elsif input_answer == "2"
+  params = {}
+  puts "Enter the following infomation for the product"
+  puts "Enter the product name:"
+  params[:name] = gets.chomp
+  puts "Enter the product's price:"
+  params[:price] = gets.chomp
+  puts "Enter the product's image:"
+  params[:image] = gets.chomp
+  puts "Enter the product's description:"
+  params[:description] = gets.chomp
+  response = Unirest.post("http://localhost:3000/v1/products/", parameters: params)
+  product = response.body
+  pp product
+  
+elsif input_answer == "3"
+  puts "Enter the product ID#:"
+  input_id = gets.chomp
+  response = Unirest.get("http://localhost:3000/v1/products/#{input_id}")
+  product = response.body
+  pp product
 
-while true
-  print_info(all_products)
-  temp = gets.chomp
-  answer = temp.to_i - 1
-  puts "#{temp}. #{all_products[answer]["name"]}"
-  puts "    Image url: #{all_products[answer]["image"]}"
-  puts "    Price: #{all_products[answer]["price"]}"
-  puts "    Description: #{all_products[answer]["description"]}"
-  puts "Enter 'Q' to quit the program or any other key to conutine."
-  input_answer = gets.chomp
-  if input_answer == 'Q'
-    break
-  end
+elsif input_answer == "4"
+  puts "Enter the product ID#:"
+  input_id = gets.chomp
+  params = {}
+  puts "Change the following infomation"
+  print "Enter the new product's name: "
+  params[:name] = gets.chomp
+  print "Enter the new product's price: "
+  params[:price] = gets.chomp
+  print "Enter the new product's image: "
+  params[:image] = gets.chomp
+  print "Enter the new product's description: "
+  params[:description] = gets.chomp
+  response = Unirest.patch("http://localhost:3000/v1/products/#{input_id}", parameters: params)
+  product = response.body
+  pp product
+
+elsif input_answer == "5"
+  puts "Enter the product ID#:"
+  input_id = gets.chomp
+  response = Unirest.delete("http://localhost:3000/v1/products/#{input_id}")
+  pp response.body
 end
