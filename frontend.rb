@@ -38,6 +38,7 @@ require "pp"
 system "clear"
 puts "Welcome to the Hockey Store! Select an option:"
 puts "[1] See all the products"
+print "     1.1 Search by porduct's name: "
 puts "[2] Create a new product"
 puts "[3] Show a particular item"
 puts "[4] Update the particular item"
@@ -49,7 +50,17 @@ if input_answer == "1"
   response = Unirest.get("http://localhost:3000/v1/products")
   all_products = response.body
   pp all_products
-
+elsif input_answer == "1.1"
+  search_name = gets.chomp
+  response = Unirest.get("http://localhost:3000/v1/products", parameters: {search_name: search_name})
+  # response = Unirest.get("http://localhost:3000/v1/products?name=#{search_name}")
+  product = response.body
+  pp product
+elsif input_answer == "1.2"
+  search_price = "desc"
+  response = Unirest.get("http://localhost:3000/v1/products", parameters: {search_price: search_price})
+  all_products = response.body
+  pp all_products
 elsif input_answer == "2"
   params = {}
   puts "Enter the following infomation for the product"
