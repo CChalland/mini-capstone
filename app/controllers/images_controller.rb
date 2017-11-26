@@ -1,9 +1,9 @@
 class ImagesController < ApplicationController
    def index
     image = Image.all.order(:id)
-    # if params[:search_url]
-    #   image = image.where(" ILIKE ?", "%#{params[:search_name]}%")
-    # end
+    if params[:search_url]
+      image = image.where(" url1 ILIKE ?", "%#{params[:search_url]}%")
+    end
     render json: image.as_json
   end
 

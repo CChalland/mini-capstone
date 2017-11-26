@@ -1,5 +1,4 @@
 class SuppliersController < ApplicationController
-
   def index
     supplier = Supplier.all.order(:id)
     if params[:search_name]
