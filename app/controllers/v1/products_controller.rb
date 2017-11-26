@@ -2,7 +2,7 @@ class V1::ProductsController < ApplicationController
   def index
     product = Product.all.order(:id)
     if params[:search_name]
-      product = product.where("name ILIKE ?", "%#{params[:search]}%")
+      product = product.where("name ILIKE ?", "%#{params[:search_name]}%")
     elsif params[:search_price]
       product = Product.order(price: :desc)
     end
