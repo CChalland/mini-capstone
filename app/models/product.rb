@@ -4,14 +4,21 @@ class Product < ApplicationRecord
   validates :price, numericality: {greater_than: 0}
   validates :description, length: {in: 5..500} 
   
+  belongs_to :supplier
   def supplier
     Supplier.find_by(id: self.supplier_id)
     # Supplier.find_by(id: supplier_id)
   end
 
-  def image
-    Image.find_by(id: self.image_id)
-  end
+  belongs_to :image
+  # def image
+  #   Image.find_by(id: self.image_id)
+  # end
+
+  # has_many :images
+  # def images
+  #   Image.where(product_id: self.id)
+  # end
 
   def is_discounted
     price <= 2
@@ -30,7 +37,8 @@ class Product < ApplicationRecord
       id: id,
       name: name,
       price: price,
-      image: image.as_json,
+      images: image.as_json,
+      # image: image.map { |index| index.url},
       description: description,
       discounted: is_discounted,
       tax: tax,

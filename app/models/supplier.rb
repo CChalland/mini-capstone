@@ -2,10 +2,11 @@ class Supplier < ApplicationRecord
   validates :name, presence: true
   validates :name, uniqueness: true
 
-  def products
-    Product.where(supplier_id: self.id)
-    # Product.where(supplier_id: id)
-  end
+  has_many :products
+  # def products
+  #   Product.where(supplier_id: self.id)
+  #   # Product.where(supplier_id: id)
+  # end
 
   def as_json
     {

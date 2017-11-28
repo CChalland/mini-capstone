@@ -1,4 +1,4 @@
-class ImagesController < ApplicationController
+class V1::ImagesController < ApplicationController
    def index
     image = Image.all.order(:id)
     if params[:search_url]

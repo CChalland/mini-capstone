@@ -6,9 +6,11 @@ class Image < ApplicationRecord
   validates :url3, presence: true
   validates :url3, uniqueness: true
 
-  def products
-    Product.where(image_id: self.id)
-  end
+  belongs_to :product
+  # def products
+  #   Product.where(image_id: self.id)
+  #   # Product.where(image_id: id)
+  # end
 
   def as_json
     {
