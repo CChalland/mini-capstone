@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  post 'user_token' => 'user_token#create'
+  
   namespace :v1 do
     get "/products" => "products#index"
     post "/products" => "products#create"
@@ -21,6 +21,8 @@ Rails.application.routes.draw do
 
     post "/users" => "users#create"
 
-    post "user_token"
+    post "/user_token" => "user_token#create"
+
+    post "/orders" => "orders#create"
   end
 end

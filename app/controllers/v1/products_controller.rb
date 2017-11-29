@@ -14,7 +14,8 @@ class V1::ProductsController < ApplicationController
       name: params[:name], 
       price: params[:price], 
       image: params[:image], 
-      description: params[:description]
+      description: params[:description],
+      user_id: current_user.id
     )
     if product.save
       render json: product.as_json

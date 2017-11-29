@@ -5,7 +5,8 @@ while true
   system "clear"
   puts "Welcome to the Hockey Store! Select an option:"
   puts "[1] See all the products"
-  print "     1.1 Search by porduct's name: "
+  puts "     1.1 Search by porduct's name: "
+  puts "          [order] Order product(s)"
   puts "[2] Create a new product"
   puts "[3] Show a particular item"
   puts "[4] Update the particular item"
@@ -97,7 +98,7 @@ while true
     print "Enter the password: "
     params[:password] = gets.chomp
     response = Unirest.post(
-      "http://localhost:3000/user_token",
+      "http://localhost:3000/v1/user_token",
       parameters: {auth: {email: params[:email], password: params[:password]}}
     )
     pp response.body
@@ -109,6 +110,17 @@ while true
   elsif input_answer == "logout"
     jwt = ""
     Unirest.clear_default_header()
+
+  elsif input_answer == "order"
+    params = {}
+    puts "Enter the following infomation for the product"
+    print "Enter the product ID: "
+    params[:product_id] = gets.chomp
+    print "Enter the product's quantity: "
+    params[:quantity] = gets.chomp.to_i
+    response = Unirest.post("http://localhost:3000/v1/orders/", parameters: params)
+    product = response.body
+    pp product
 
   elsif input_answer == "q"
     puts "Goodbye!"

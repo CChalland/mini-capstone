@@ -1,4 +1,4 @@
-class UserTokenController < Knock::AuthTokenController
+class V1::UserTokenController < Knock::AuthTokenController
   # before_action :authenticate_user
   # if current_user
   #   products = current_user.products
