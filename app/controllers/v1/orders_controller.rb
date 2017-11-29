@@ -14,7 +14,7 @@ class V1::OrdersController < ApplicationController
     order = Order.new(
       user_id: current_user.id,
       product_id: params[:product_id],
-      quantity: params[:quantity],
+      quantity: params[:quantity]
     )
     product = Product.find_by(id: order[:product_id])
     order[:subtotal] = product.price * order[:quantity]
