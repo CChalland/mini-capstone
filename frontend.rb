@@ -7,6 +7,7 @@ while true
   puts "[1] See all the products"
   puts "     1.1 Search by porduct's name: "
   puts "          [order] Order product(s)"
+  puts "          [show] Show ordered product(s)"
   puts "[2] Create a new product"
   puts "[3] Show a particular item"
   puts "[4] Update the particular item"
@@ -121,6 +122,11 @@ while true
     response = Unirest.post("http://localhost:3000/v1/orders/", parameters: params)
     product = response.body
     pp product
+
+  elsif input_answer == "show"
+    response = Unirest.get("http://localhost:3000/v1/orders")
+    order = response.body
+    pp order
 
   elsif input_answer == "q"
     puts "Goodbye!"

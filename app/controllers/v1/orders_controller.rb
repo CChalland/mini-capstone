@@ -1,5 +1,15 @@
 class V1::OrdersController < ApplicationController
 
+  def index
+    order = Order.all.order(:id)
+    if current_user
+      order = current_user.orders
+      render json: order.as_json
+    else
+      render json: []
+    end
+  end
+
   def create
     order = Order.new(
       user_id: current_user.id,

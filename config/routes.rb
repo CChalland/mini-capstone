@@ -23,6 +23,7 @@ Rails.application.routes.draw do
 
     post "/user_token" => "user_token#create"
 
+    get "/orders" => "orders#index"
     post "/orders" => "orders#create"
   end
 end
