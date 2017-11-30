@@ -15,7 +15,7 @@ class V1::ProductsController < ApplicationController
     product = Product.new(
       name: params[:name], 
       price: params[:price],
-      image: params[:image],
+      # image: params[:image],
       description: params[:description]
     )
     if product.save
