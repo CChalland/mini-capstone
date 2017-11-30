@@ -9,10 +9,9 @@ class V1::ImagesController < ApplicationController
 
   def create
     image = Image.new(
-      url1: params[:url1],
-      url2: params[:url2],
-      url3: params[:url3]
-      )
+      url: params[:url],
+      product_id: params[:product_id]
+    )
     if image.save
       render json: image.as_json
     else
@@ -21,17 +20,14 @@ class V1::ImagesController < ApplicationController
   end
 
   def show
-    input = params[:id].to_i
-    return_image = Image.find_by(id: input)
+    return_image = Image.find_by(id: params[:id].to_i)
     render json: return_image.as_json
   end
 
   def update
-    input = params[:id].to_i
-    image = Image.find_by(id: input)
-    image.url1 = params[:url1]
-    image.url2 = params[:url2]
-    image.url3 = params[:url3]
+    image = Image.find_by(id: params[:id].to_i)
+    image.url = params[:url]
+    image.product_id = params[:product_id]
     if image.save
       render json: image.as_json
     else
@@ -40,8 +36,7 @@ class V1::ImagesController < ApplicationController
   end
 
   def destroy
-    input = params[:id].to_i
-    image = Image.find_by(id: input)
+    image = Image.find_by(id: params[:id].to_i)
     image.destroy
     render json: {message: "You have deleted this image"}
   end

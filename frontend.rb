@@ -1,382 +1,226 @@
 require "unirest"
 require "pp"
-@baseurl = "http://localhost:3000/v1/"
 
-def print_menu
-  system "clear"
-  puts "Welcome to the Hockey Store! Select an option:"
-  puts "[1] See all the products"
-  puts "     [1.1] Search by porduct's name"
-  puts "     [order] Order product(s)"
-  puts "     [show] Show ordered product(s)"
-  puts "[2] Create a new product"
-  puts "[3] Show a particular item"
-  puts "[4] Update the particular item"
-  puts "[5] Delete the particular item"
-  puts 
-  puts "[inputuser] Create a new User"
-  puts "[login] Login with Username and password"
-  puts "[q] Quit"
-end
-
-def see_all
-  response = Unirest.get("#{@baseurl}products")
-  all_products = response.body
-  pp all_products
-end
-
-def search_name(input)
-  search_name = gets.chomp
-  response = Unirest.get("#{@baseurl}products", parameters: {search_name: search_name})
-  # response = Unirest.get("#{@baseurl}products?name=#{search_name}")
-  product = response.body
-  pp product
-end
-
-def sort_desc
-  search_price = "desc"
-  response = Unirest.get("#{@baseurl}products", parameters: {search_price: search_price})
-  all_products = response.body
-  pp all_products
-end
-
-def order
-  params = {}
-  puts "Enter the following information for the product"
-  print "Enter the product ID: "
-  params[:product_id] = gets.chomp
-  print "Enter the product's quantity: "
-  params[:quantity] = gets.chomp.to_i
-  response = Unirest.post("#{@baseurl}orders/", parameters: params)
-  product = response.body
-  pp product
-end
-
-def show_order
-  response = Unirest.get("#{@baseurl}orders")
-  order = response.body
-  pp order
-end
-
-def createImage
-  params = {}
-  puts "Enter the following urls for the product's images"
-  puts "Enter first(1st) url"
-  params[:url1] = gets.chomp
-  puts "Enter second(2nd) url"
-  params[:url2] = gets.chomp
-  puts "Enter the third(3rd) url"
-  params[:url3] = gets.chomp
-  response = Unirest.post("#{@baseurl}images/", parameters: params)
-  image = response.body
-  pp image
-end
-
-def createProduct
-  params = {}
-  puts "Enter the following infomation for the product"
-  puts "Enter the product name:"
-  params[:name] = gets.chomp
-  puts "Enter the product's price:"
-  params[:price] = gets.chomp
-  puts "Enter the product's image:"
-  params[:image] = createImage
-  puts "Enter the product's description:"
-  params[:description] = gets.chomp
-  response = Unirest.post("#{@baseurl}products/", parameters: params)
-  product = response.body
-  pp product
-end
-
-def show_item
-  puts "Enter the product ID#:"
-  input_id = gets.chomp
-  response = Unirest.get("#{@baseurl}products/#{input_id}")
-  product = response.body
-  pp product
-end
-
-def update_item
-  puts "Enter the product ID#:"
-  input_id = gets.chomp
-  params = {}
-  puts "Change the following infomation"
-  print "Enter the new product's name: "
-  params[:name] = gets.chomp
-  print "Enter the new product's price: "
-  params[:price] = gets.chomp
-  print "Enter the new product's image: "
-  params[:image_id] = gets.chomp
-  print "Enter the new product's description: "
-  params[:description] = gets.chomp
-  response = Unirest.patch("#{@baseurl}products/#{input_id}", parameters: params)
-  product = response.body
-  pp product
-end
-
-def delete_item
-  puts "Enter the product ID#:"
-  input_id = gets.chomp
-  response = Unirest.delete("#{@baseurl}products/#{input_id}")
-  pp response.body
-end
-
-def create_user
-  params = {}
-  print "Enter the user name: "
-  params[:user_name] = gets.chomp
-  print "Enter the email: "
-  params[:email] = gets.chomp
-  print "Enter the password: "
-  params[:password] = gets.chomp
-  print "Enter the password again: "
-  params[:password_confirmation] = gets.chomp
-  response = Unirest.post("#{@baseurl}users/", parameters: params)
-  pp response.body
-end
-
-def login
-  params = {}
-  print "Enter the Email: "
-  params[:email] = gets.chomp
-  print "Enter the password: "
-  params[:password] = gets.chomp
-  response = Unirest.post(
-    "#{@baseurl}user_token",
-    parameters: {auth: {email: params[:email], password: params[:password]}}
-  )
-  pp response.body
-  # Save the JSON web token from the response
-  jwt = response.body["jwt"]
-  # Include the jwt in the headers of any future web requests
-  Unirest.default_header("Authorization", "Bearer #{jwt}")
-end
-
-def logout
-  jwt = ""
-  Unirest.clear_default_header()
-end
-
-def quit
-  puts "Goodbye!"
-  exit
-end
-
-while true
-  print_menu
-  input_answer = gets.chomp
-  if input_answer == "1"
-    see_all
-  elsif input_answer == "1.1"
-    search_name
-  elsif input_answer == "1.2"
-    sort_desc
-  elsif input_answer == "2"
-    createProduct 
-  elsif input_answer == "3"
-    show_item
-  elsif input_answer == "4"
-    update_item
-  elsif input_answer == "5"
-    delete_item
-  elsif input_answer == "inputuser"
-    create_user
-  elsif input_answer == "login"
-    login
-  elsif input_answer == "logout"
-    logout
-  elsif input_answer == "order"
-    order
-  elsif input_answer == "show"
-    show_order
-  elsif input_answer == "q"
-    quit
+class Frontend
+  def initialize
+    @jwt = ""
+    @menu_options = [
+      {value: "1", prompt: "Show all products", method: -> do show_all_products end},
+      {value: "1.1", prompt: "\tShow all products that match search terms", method: -> do show_all_products_search end},
+      {value: "1.2", prompt: "\tShow all products sorted by price", method: -> do show_all_products_sorted_by_price end},
+      {value: "2", prompt: "Create a product", method: -> do create_product end},
+      {value: "2.1", prompt: "\tCreate a Image for product", method: -> do create_image end},
+      {value: "3", prompt: "Show one product", method: -> do show_one_product end},
+      {value: "4", prompt: "Update a product", method: -> do update_product end},
+      {value: "5", prompt: "Delete a product", method: -> do delete_product end},
+      {value: "6", prompt: "Order a product", method: -> do order_product end},
+      {value: "7", prompt: "View all orders", method: -> do show_all_orders end},
+      {value: "signup", prompt: "Sign up (create a user)", method: -> do signup end},
+      {value: "login", prompt: "Log in (create a jwt)", method: -> do login end},
+      {value: "logout", prompt: "Log out (destroy the jwt)", method: -> do logout end},
+      {value: "q", prompt: "Quit", method: -> do quit end}
+    ]
   end
-  puts
-  puts "Press enter to continue"
-  gets.chomp
+
+  def find_menu_option(input_value)
+    @menu_options.each do |menu_option|
+      if menu_option[:value] == input_value
+        return menu_option
+      end
+    end
+    return nil
+  end
+
+  def show_menu
+    system "clear"
+    puts "Choose an option:"
+    @menu_options.each do |menu_option|
+      puts "[#{menu_option[:value]}] #{menu_option[:prompt]}"
+    end
+  end
+
+  def show_all_products
+    response = Unirest.get("http://localhost:3000/v1/products")
+    products = response.body
+    pp products
+  end
+
+  def show_all_products_search
+    print "Enter search terms: "
+    input_search_terms = gets.chomp
+    response = Unirest.get("http://localhost:3000/v1/products?search=#{input_search_terms}")
+    products = response.body
+    pp products
+  end
+
+  def show_all_products_sorted_by_price
+    response = Unirest.get("http://localhost:3000/v1/products?sort_by_price=true")
+    products = response.body
+    pp products
+  end
+
+  def create_product
+    params = {}
+    print "New product name: "
+    params[:name] = gets.chomp
+    print "New product price: "
+    params[:price] = gets.chomp
+    print "New product image: "
+    print "New product description: "
+    params[:description] = gets.chomp
+    response = Unirest.post("http://localhost:3000/v1/products", parameters: params)
+    product = response.body
+    if product["errors"]
+      puts "No good!"
+      p product["errors"]
+    else
+      puts "All good!"
+      pp product
+    end
+  end
+
+  def create_image
+    params = {}
+    puts "Enter the following url for the product's images"
+    puts "Enter the url"
+    params[:url] = gets.chomp
+    print "Enter image's product_id:"
+    params[:product_id] = gets.chomp
+    response = Unirest.post("http://localhost:3000/v1/images", parameters: params)
+    image = response.body
+    if image[:errors]
+      puts "No good!"
+      p image[:errors]
+    else
+      puts "All good!"
+      pp image
+    end
+  end
+
+  def show_one_product
+    print "Enter a product id: "
+    product_id = gets.chomp
+    response = Unirest.get("http://localhost:3000/v1/products/#{product_id}")
+    product = response.body
+    pp product
+  end
+
+  def update_product
+    print "Enter a product id: "
+    product_id = gets.chomp
+    response = Unirest.get("http://localhost:3000/v1/products/#{product_id}")
+    product = response.body
+    params = {}
+    print "Updated product name (#{product["name"]}): "
+    params[:name] = gets.chomp
+    print "Updated product price (#{product["price"]}): "
+    params[:price] = gets.chomp
+    print "Updated product image (#{product["image"]}): "
+    params[:image] = gets.chomp
+    print "Updated product description (#{product["description"]}): "
+    params[:description] = gets.chomp
+    params.delete_if { |_key, value| value.empty? }
+    response = Unirest.patch("http://localhost:3000/v1/products/#{product_id}", parameters: params)
+    product = response.body
+    pp response.body
+  end
+
+  def delete_product
+    print "Enter a product id: "
+    product_id = gets.chomp
+    response = Unirest.delete("http://localhost:3000/v1/products/#{product_id}")
+    pp response.body
+  end
+
+  def order_product
+    params = {}
+    print "Product id: "
+    params[:input_product_id] = gets.chomp
+    print "Quantity: "
+    params[:input_quantity] = gets.chomp
+    response = Unirest.post("http://localhost:3000/v1/orders", parameters: params)
+    order = response.body
+    if order["errors"]
+      puts "No good!"
+      p order["errors"]
+    else
+      puts "All good!"
+      pp order
+    end
+  end
+
+  def show_all_orders
+    response = Unirest.get("http://localhost:3000/v1/orders")
+    orders = response.body
+    pp orders
+  end
+
+  def signup
+    print "Enter name: "
+    input_name = gets.chomp
+    print "Enter email: "
+    input_email = gets.chomp
+    print "Enter password: "
+    input_password = gets.chomp
+    print "Confirm password: "
+    input_password_confirmation = gets.chomp
+    response = Unirest.post(
+      "http://localhost:3000/v1/users",
+      parameters: {
+        name: input_name,
+        email: input_email,
+        password: input_password,
+        password_confirmation: input_password_confirmation
+      }
+    )
+    pp response.body
+  end
+
+  def login
+    print "Enter email: "
+    input_email = gets.chomp
+    print "Enter password: "
+    input_password = gets.chomp
+    response = Unirest.post(
+      "http://localhost:3000/user_token",
+      parameters: {
+        auth: {
+          email: input_email,
+          password: input_password
+        }
+      }
+    )
+    @jwt = response.body["jwt"]
+    Unirest.default_header("Authorization", "Bearer #{@jwt}")
+    pp response.body
+  end
+
+  def logout
+    @jwt = ""
+    Unirest.clear_default_headers()
+    puts "Logged out successfully!"
+  end
+
+  def quit
+    puts "Goodbye!"    
+    exit
+  end
+
+  def run
+    while true
+      show_menu
+      input_option = gets.chomp
+      menu_option = find_menu_option(input_option)
+      if menu_option
+        menu_option[:method].call
+      else
+        puts "Unknown option."        
+      end
+      puts "Press enter to continue"
+      gets.chomp
+    end    
+  end
 end
 
-
-
-
-# require "unirest"
-# require "pp"
-# baseurl = "http://localhost:3000/v1/"
-
-# while true
-#   system "clear"
-#   puts "Welcome to the Hockey Store! Select an option:"
-#   puts "[1] See all the products"
-#   puts "     [1.1] Search by porduct's name"
-#   puts "     [order] Order product(s)"
-#   puts "     [show] Show ordered product(s)"
-#   puts "[2] Create a new product"
-#   puts "[3] Show a particular item"
-#   puts "[4] Update the particular item"
-#   puts "[5] Delete the particular item"
-#   puts 
-#   puts "[inputuser] Create a new User"
-#   puts "[login] Login with Username and password"
-#   puts "[q] Quit"
-
-#   input_answer = gets.chomp
-
-#   if input_answer == "1"
-#     response = Unirest.get("#{baseurl}products")
-#     all_products = response.body
-#     pp all_products
-#   elsif input_answer == "1.1"
-#     search_name = gets.chomp
-#     response = Unirest.get("#{baseurl}products", parameters: {search_name: search_name})
-#     # response = Unirest.get("#{baseurl}products?name=#{search_name}")
-#     product = response.body
-#     pp product
-#   elsif input_answer == "1.2"
-#     search_price = "desc"
-#     response = Unirest.get("#{baseurl}products", parameters: {search_price: search_price})
-#     all_products = response.body
-#     pp all_products
-#   elsif input_answer == "2"
-#     params = {}
-#     puts "Enter the following infomation for the product"
-#     puts "Enter the product name:"
-#     params[:name] = gets.chomp
-#     puts "Enter the product's price:"
-#     params[:price] = gets.chomp
-#     puts "Enter the product's image:"
-#     params[:image] = gets.chomp
-#     puts "Enter the product's description:"
-#     params[:description] = gets.chomp
-#     response = Unirest.post("#{baseurl}products/", parameters: params)
-#     product = response.body
-#     pp product
-    
-#   elsif input_answer == "3"
-#     puts "Enter the product ID#:"
-#     input_id = gets.chomp
-#     response = Unirest.get("#{baseurl}products/#{input_id}")
-#     product = response.body
-#     pp product
-
-#   elsif input_answer == "4"
-#     puts "Enter the product ID#:"
-#     input_id = gets.chomp
-#     params = {}
-#     puts "Change the following infomation"
-#     print "Enter the new product's name: "
-#     params[:name] = gets.chomp
-#     print "Enter the new product's price: "
-#     params[:price] = gets.chomp
-#     print "Enter the new product's image: "
-#     params[:image] = gets.chomp
-#     print "Enter the new product's description: "
-#     params[:description] = gets.chomp
-#     response = Unirest.patch("#{baseurl}products/#{input_id}", parameters: params)
-#     product = response.body
-#     pp product
-
-#   elsif input_answer == "5"
-#     puts "Enter the product ID#:"
-#     input_id = gets.chomp
-#     response = Unirest.delete("#{baseurl}products/#{input_id}")
-#     pp response.body
-
-#   elsif input_answer == "inputuser"
-#     params = {}
-#     print "Enter the user name: "
-#     params[:user_name] = gets.chomp
-#     print "Enter the email: "
-#     params[:email] = gets.chomp
-#     print "Enter the password: "
-#     params[:password] = gets.chomp
-#     print "Enter the password again: "
-#     params[:password_confirmation] = gets.chomp
-#     response = Unirest.post("#{baseurl}users/", parameters: params)
-#     pp response.body
-
-#   elsif input_answer == "login"
-#     params = {}
-#     print "Enter the Email: "
-#     params[:email] = gets.chomp
-#     print "Enter the password: "
-#     params[:password] = gets.chomp
-#     response = Unirest.post(
-#       "#{baseurl}user_token",
-#       parameters: {auth: {email: params[:email], password: params[:password]}}
-#     )
-#     pp response.body
-#     # Save the JSON web token from the response
-#     jwt = response.body["jwt"]
-#     # Include the jwt in the headers of any future web requests
-#     Unirest.default_header("Authorization", "Bearer #{jwt}")
-
-#   elsif input_answer == "logout"
-#     jwt = ""
-#     Unirest.clear_default_header()
-
-#   elsif input_answer == "order"
-#     params = {}
-#     puts "Enter the following information for the product"
-#     print "Enter the product ID: "
-#     params[:product_id] = gets.chomp
-#     print "Enter the product's quantity: "
-#     params[:quantity] = gets.chomp.to_i
-#     response = Unirest.post("#{baseurl}orders/", parameters: params)
-#     product = response.body
-#     pp product
-
-#   elsif input_answer == "show"
-#     response = Unirest.get("#{baseurl}orders")
-#     order = response.body
-#     pp order
-
-#   elsif input_answer == "q"
-#     puts "Goodbye!"
-#     break
-#   end
-
-#   puts
-#   puts "Press enter to continue"
-#   temp = gets.chomp
-# end
-
-
-
-
-
-
-
-
-
-
-
-# response = Unirest.get("http://localhost:3000/v1/all_products_info")
-# all_products = response.body
-
-# def print_info(input)
-#   system "clear"
-#   puts "Welcome to Cole's Hockey Store!!"
-
-#   i = 1
-#   input.each do |product|
-#     puts "#{i}. #{product["name"]}"
-#     i += 1
-#   end
-#   puts "Enter the number product to view product's full infomation."
-# end
-
-# while true
-#   print_info(all_products)
-#   temp = gets.chomp
-#   answer = temp.to_i - 1
-#   puts "#{temp}. #{all_products[answer]["name"]}"
-#   puts "    Image url: #{all_products[answer]["image"]}"
-#   puts "    Price: #{all_products[answer]["price"]}"
-#   puts "    Description: #{all_products[answer]["description"]}"
-#   puts "Enter 'Q' to quit the program or any other key to conutine."
-#   input_answer = gets.chomp
-#   if input_answer == 'Q'
-#     break
-#   end
-# end
+frontend = Frontend.new
+frontend.run
