@@ -1,4 +1,6 @@
 class V1::ProductsController < ApplicationController
+  before_action :authenticate_user, except: [:index, :show]
+
   def index
     product = Product.all.order(:id)
     if params[:search_name]
@@ -12,10 +14,9 @@ class V1::ProductsController < ApplicationController
   def create
     product = Product.new(
       name: params[:name], 
-      price: params[:price], 
-      image: params[:image], 
-      description: params[:description],
-      user_id: current_user.id
+      price: params[:price],
+      image: params[:image],
+      description: params[:description]
     )
     if product.save
       render json: product.as_json
@@ -25,14 +26,12 @@ class V1::ProductsController < ApplicationController
   end
 
   def show
-    input = params["id"].to_i
-    return_product = Product.find_by(id: input)
+    return_product = Product.find_by(id: params[:id].to_i)
     render json: return_product.as_json
   end
 
   def update
-    input = params[:id].to_i
-    product = Product.find_by(id: input)
+    product = Product.find_by(id: params[:id].to_i)
     product.name = params[:name]
     product.price = params[:price]
     product.image = params[:image]
@@ -45,8 +44,7 @@ class V1::ProductsController < ApplicationController
   end
 
   def destroy
-    input = params[:id].to_i
-    product = Product.find_by(id: input)
+    product = Product.find_by(id: params[:id].to_i)
     product.destroy
     render json: {message: "You have deleted this item"}
   end

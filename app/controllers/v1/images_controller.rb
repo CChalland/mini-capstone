@@ -16,7 +16,7 @@ class V1::ImagesController < ApplicationController
     if image.save
       render json: image.as_json
     else
-      render json: {errors: image.errors.full_messages} status: :bad_request
+      render json: {errors: image.errors.full_messages}, status: :bad_request
     end
   end
 

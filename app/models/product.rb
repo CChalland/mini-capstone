@@ -5,21 +5,13 @@ class Product < ApplicationRecord
   validates :description, length: {in: 5..500} 
   
   has_many :orders
-
   belongs_to :supplier
-  def supplier
-    Supplier.find_by(id: self.supplier_id)
-    # Supplier.find_by(id: supplier_id)
-  end
-
-  belongs_to :image
-  # def image
-  #   Image.find_by(id: self.image_id)
+  # def supplier
+  #   Supplier.find_by(id: supplier_id)
   # end
-
-  # has_many :images
+  has_many :images
   # def images
-  #   Image.where(product_id: self.id)
+  #   Image.find_by(id: self.image_id)
   # end
 
   def is_discounted
@@ -27,28 +19,24 @@ class Product < ApplicationRecord
   end
 
   def tax
-    return (price * 0.09)
+    price * 0.09
   end
 
   def total
-    return (price + tax)
+    price + tax
   end
 
   def as_json
     {
       id: id,
       name: name,
-      price: price,
-      images: image.as_json,
-      # image: image.map { |index| index.url},
       description: description,
-      discounted: is_discounted,
+      image: images.map { |image| image.url},
+      price: price,
       tax: tax,
       total: total,
-      availability: availability,
+      discounted: is_discounted,
       supplier: supplier.as_json,
-      created_at: created_at,
-      updated_at: updated_at  
     }
   end
 end
