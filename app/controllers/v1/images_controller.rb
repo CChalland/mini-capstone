@@ -1,4 +1,6 @@
 class V1::ImagesController < ApplicationController
+   before_action :authenticate_admin, except: [:index, :show]
+   
    def index
     image = Image.all.order(:id)
     if params[:search_url]

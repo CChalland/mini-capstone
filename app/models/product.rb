@@ -13,7 +13,6 @@ class Product < ApplicationRecord
   # def images
   #   Image.find_by(id: self.image_id)
   # end
-
   def is_discounted
     price <= 2
   end

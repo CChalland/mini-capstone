@@ -48,13 +48,13 @@ class Frontend
   def show_all_products_search
     print "Enter search terms: "
     input_search_terms = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/products?search=#{input_search_terms}")
+    response = Unirest.get("http://localhost:3000/v1/products?search_name=#{input_search_terms}")
     products = response.body
     pp products
   end
 
   def show_all_products_sorted_by_price
-    response = Unirest.get("http://localhost:3000/v1/products?sort_by_price=true")
+    response = Unirest.get("http://localhost:3000/v1/products?search_price=true")
     products = response.body
     pp products
   end
@@ -65,9 +65,10 @@ class Frontend
     params[:name] = gets.chomp
     print "New product price: "
     params[:price] = gets.chomp
-    print "New product image: "
     print "New product description: "
     params[:description] = gets.chomp
+    print "New product supplier_id: "
+    params[:supplier_id] = gets.chomp
     response = Unirest.post("http://localhost:3000/v1/products", parameters: params)
     product = response.body
     if product["errors"]
@@ -88,9 +89,9 @@ class Frontend
     params[:product_id] = gets.chomp
     response = Unirest.post("http://localhost:3000/v1/images", parameters: params)
     image = response.body
-    if image[:errors]
+    if image["errors"]
       puts "No good!"
-      p image[:errors]
+      p image["errors"]
     else
       puts "All good!"
       pp image
@@ -111,14 +112,16 @@ class Frontend
     response = Unirest.get("http://localhost:3000/v1/products/#{product_id}")
     product = response.body
     params = {}
-    print "Updated product name (#{product["name"]}): "
+    print "Updated product name (#{product[:name]}): "
     params[:name] = gets.chomp
-    print "Updated product price (#{product["price"]}): "
+    print "Updated product price (#{product[:price]}): "
     params[:price] = gets.chomp
-    print "Updated product image (#{product["image"]}): "
-    params[:image] = gets.chomp
-    print "Updated product description (#{product["description"]}): "
-    params[:description] = gets.chomp
+    print "Updated product description (#{product[:description]}): "
+    params[:description] = gets.chomp 
+    print "Updated product supplier_id (#{product[:supplier_id]}): "
+    params[:supplier_id] = gets.chomp
+    print "Updated product availability(#{product[:availability]}): "
+    gets.chomp == "false" ? params[:availability] = false : true
     params.delete_if { |_key, value| value.empty? }
     response = Unirest.patch("http://localhost:3000/v1/products/#{product_id}", parameters: params)
     product = response.body
@@ -156,7 +159,7 @@ class Frontend
   end
 
   def signup
-    print "Enter name: "
+    print "Enter username: "
     input_name = gets.chomp
     print "Enter email: "
     input_email = gets.chomp
@@ -167,7 +170,7 @@ class Frontend
     response = Unirest.post(
       "http://localhost:3000/v1/users",
       parameters: {
-        name: input_name,
+        user_name: input_name,
         email: input_email,
         password: input_password,
         password_confirmation: input_password_confirmation

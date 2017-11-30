@@ -1,5 +1,5 @@
 class V1::ProductsController < ApplicationController
-  before_action :authenticate_user, except: [:index, :show]
+  before_action :authenticate_admin, except: [:index, :show]
 
   def index
     product = Product.all.order(:id)
@@ -14,9 +14,10 @@ class V1::ProductsController < ApplicationController
   def create
     product = Product.new(
       name: params[:name], 
-      price: params[:price],
-      # image: params[:image],
-      description: params[:description]
+      price: params[:price].to_f,
+      description: params[:description],
+      supplier_id: params[:supplier_id].to_i,
+      availability: true
     )
     if product.save
       render json: product.as_json
@@ -34,7 +35,6 @@ class V1::ProductsController < ApplicationController
     product = Product.find_by(id: params[:id].to_i)
     product.name = params[:name]
     product.price = params[:price]
-    product.image = params[:image]
     product.description = params[:description]
     if product.save
       render json: product.as_json
