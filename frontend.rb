@@ -10,16 +10,16 @@ class User
       {id: 10, value: "1", prompt: "Show all products", method: -> do show_all_products end},
       {id: 11, value: "1.1", prompt: "\tShow all products that match search terms", method: -> do show_all_products_search end},
       {id: 12, value: "1.2", prompt: "\tShow all products sorted by price", method: -> do show_all_products_sorted_by_price end},
+      {id: 13, value: "1.3", prompt: "\tShow one product", method: -> do show_one_product end},
       {id: 20, value: "2", prompt: "Create Settings", method: nil},
-      {id: 30, value: "3", prompt: "Show one product", method: -> do show_one_product end},
-      {id: 40, value: "4", prompt: "Update Settings", method: nil},
-      {id: 50, value: "5", prompt: "Delete Settings", method: nil},
-      {id: 60, value: "6", prompt: "Order a product", method: -> do order_product end},
-      {id: 70, value: "7", prompt: "View all orders", method: -> do show_all_orders end},
-      {id: 80, value: "signup", prompt: "Sign up (create a user)", method: -> do signup end},
-      {id: 90, value: "login", prompt: "Log in (create a jwt)", method: -> do login end},
-      {id: 100, value: "logout", prompt: "Log out (destroy the jwt)", method: -> do logout end},
-      {id: 110, value: "q", prompt: "Quit", method: -> do quit end}
+      {id: 30, value: "3", prompt: "Update Settings", method: nil},
+      {id: 40, value: "4", prompt: "Delete Settings", method: nil},
+      {id: 50, value: "5", prompt: "Order a product", method: -> do order_product end},
+      {id: 60, value: "6", prompt: "View all orders", method: -> do show_all_orders end},
+      {id: 70, value: "signup", prompt: "Sign up (create a user)", method: -> do signup end},
+      {id: 80, value: "login", prompt: "Log in (create a jwt)", method: -> do login end},
+      {id: 90, value: "logout", prompt: "Log out (destroy the jwt)", method: -> do logout end},
+      {id: 100, value: "q", prompt: "Quit", method: -> do quit end}
     ]
     @admin_user = false
     @quit_temp = false
@@ -176,21 +176,21 @@ class Admin < User
 
   def initialize
     super
-    @menu_options << {id: 13, value: "1.3", prompt: "**Show one User", method: -> do show_one_user end}
-    @menu_options << {id: 14, value: "1.4", prompt: "**Show all Users", method: -> do show_all_users end}
-    @menu_options << {id: 15, value: "1.5", prompt: "**Show all Users that match search terms", method: -> do show_all_users_search end}
-    @menu_options << {id: 16, value: "1.6", prompt: "**Show all Users sorted by their join date", method: -> do show_all_users_sorted_by_created end}
+    @menu_options << {id: 14, value: "1.4", prompt: "**Show one User", method: -> do show_one_user end}
+    @menu_options << {id: 15, value: "1.5", prompt: "**Show all Users", method: -> do show_all_users end}
+    @menu_options << {id: 16, value: "1.6", prompt: "**Show all Users that match search terms", method: -> do show_all_users_search end}
+    @menu_options << {id: 17, value: "1.7", prompt: "**Show all Users sorted by their join date", method: -> do show_all_users_sorted_by_created end}
     @menu_options << {id: 21, value: "2.1", prompt: "**Create a supplier", method: -> do create_supplier end}
     @menu_options << {id: 22, value: "2.2", prompt: "**Create a product", method: -> do create_product end}
     @menu_options << {id: 23, value: "2.3", prompt: "**Create a Image for product", method: -> do create_image end}
-    @menu_options << {id: 41, value: "4.1", prompt: "**Update a supplier", method: -> do update_supplier end}
-    @menu_options << {id: 42, value: "4.2", prompt: "**Update a product", method: -> do update_product end}
-    @menu_options << {id: 43, value: "4.3", prompt: "**Update a image", method: -> do update_image end}
-    @menu_options << {id: 44, value: "4.4", prompt: "**Update a user", method: -> do update_user end}
-    @menu_options << {id: 51, value: "5.1", prompt: "**Delete a supplier", method: -> do delete_supplier end}
-    @menu_options << {id: 52, value: "5.2", prompt: "**Delete a product", method: -> do delete_product end}
-    @menu_options << {id: 53, value: "5.3", prompt: "**Delete a image", method: -> do delete_image end}
-    @menu_options << {id: 54, value: "5.4", prompt: "**Delete a user", method: -> do delete_user end}
+    @menu_options << {id: 31, value: "3.1", prompt: "**Update a supplier", method: -> do update_supplier end}
+    @menu_options << {id: 32, value: "3.2", prompt: "**Update a product", method: -> do update_product end}
+    @menu_options << {id: 33, value: "3.3", prompt: "**Update a image", method: -> do update_image end}
+    @menu_options << {id: 34, value: "3.4", prompt: "**Update a user", method: -> do update_user end}
+    @menu_options << {id: 41, value: "4.1", prompt: "**Delete a supplier", method: -> do delete_supplier end}
+    @menu_options << {id: 42, value: "4.2", prompt: "**Delete a product", method: -> do delete_product end}
+    @menu_options << {id: 43, value: "4.3", prompt: "**Delete a image", method: -> do delete_image end}
+    @menu_options << {id: 44, value: "4.4", prompt: "**Delete a user", method: -> do delete_user end}
   end
 
   def create_supplier
