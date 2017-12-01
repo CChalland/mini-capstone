@@ -2,7 +2,7 @@ require "unirest"
 require "pp"
 
 class User
-  attr_reader :admin, :quit_temp
+  attr_reader :quit_temp
 
   def initialize
     @jwt = ""
