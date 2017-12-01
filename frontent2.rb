@@ -2,6 +2,8 @@ require "unirest"
 require "pp"
 
 class User
+  attr_reader :admin, :quit_temp
+
   def initialize
     @jwt = ""
     @menu_options = [
@@ -19,7 +21,8 @@ class User
       {id: 10, value: "logout", prompt: "Log out (destroy the jwt)", method: -> do logout end},
       {id: 11, value: "q", prompt: "Quit", method: -> do quit end}
     ]
-    @admin = false
+    @quit_temp = false
+    @user_email = ""
   end
 
   def find_menu_option(input_value)
@@ -113,14 +116,14 @@ class User
 
   def login
     print "Enter email: "
-    input_email = gets.chomp
+    @user_email = gets.chomp
     print "Enter password: "
     input_password = gets.chomp
     response = Unirest.post(
       "http://localhost:3000/user_token",
       parameters: {
         auth: {
-          email: input_email,
+          email: @user_email,
           password: input_password
         }
       }
@@ -137,7 +140,8 @@ class User
   end
 
   def quit
-    puts "Goodbye!"    
+    puts "Goodbye!"
+    @quit = true   
     exit
   end
 
@@ -149,7 +153,11 @@ class User
       if menu_option
         menu_option[:method].call
         if input_option == "login"
-          break
+          response = Unirest.get("http://localhost:3000/v1/users?search_user_email=#{@user_email}")
+          user = response.body
+          if user[0]["admin"]
+            break
+          end
         end
       else
         puts "Unknown option."        
@@ -373,11 +381,9 @@ class Admin < User
   end
 end
 
-def main
-  user = User.new
-  admin = Admin.new
+user = User.new
+admin = Admin.new
+unless user.quit_temp
   user.run()
   admin.run()
 end
-
-main

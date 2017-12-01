@@ -16,7 +16,7 @@ class V1::SuppliersController < ApplicationController
     if supplier.save
       render json: supplier.as_json
     else
-      render json: {errors: supplier.errors.full_messages} status: :bad_request
+      render json: {errors: supplier.errors.full_messages}, status: :bad_request
     end
   end
 
