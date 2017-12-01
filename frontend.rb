@@ -59,6 +59,14 @@ class Frontend
     pp products
   end
 
+  def show_one_product
+    print "Enter a product id: "
+    product_id = gets.chomp
+    response = Unirest.get("http://localhost:3000/v1/products/#{product_id}")
+    product = response.body
+    pp product
+  end
+  
   def create_product
     params = {}
     print "New product name: "
@@ -96,14 +104,6 @@ class Frontend
       puts "All good!"
       pp image
     end
-  end
-
-  def show_one_product
-    print "Enter a product id: "
-    product_id = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/products/#{product_id}")
-    product = response.body
-    pp product
   end
 
   def update_product

@@ -21,9 +21,16 @@ Rails.application.routes.draw do
     patch "/images/:id" => "images#update"
     delete "/images/:id" => "images#destroy"
 
+    get "/users" => "users#index"
     post "/users" => "users#create"
+    get "/users/:id" => "users#show"
+    # patch "/users/:id" => "users#update"
+    # delete "/users/:id" => "users#destroy"
 
     get "/orders" => "orders#index"
     post "/orders" => "orders#create"
+    # get "/orders/:id" => "orders#show"
+    # patch "/orders/:id" => "orders#update"
+    # delete "/orders/:id" => "orders#destroy"
   end
 end
