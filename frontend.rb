@@ -2,25 +2,26 @@ require "unirest"
 require "pp"
 
 class User
-  attr_reader :quit_temp
+  attr_reader :admin_user, :quit_temp
 
   def initialize
     @jwt = ""
     @menu_options = [
-      {id: 1, value: "1", prompt: "Show all products", method: -> do show_all_products end},
-      {id: 1.1, value: "1.1", prompt: "Show all products that match search terms", method: -> do show_all_products_search end},
-      {id: 1.2, value: "1.2", prompt: "Show all products sorted by price", method: -> do show_all_products_sorted_by_price end},
-      {id: 2, value: "2", prompt: "Create Settings", method: nil},
-      {id: 3, value: "3", prompt: "Show one product", method: -> do show_one_product end},
-      {id: 4, value: "4", prompt: "Update Settings", method: nil},
-      {id: 5, value: "5", prompt: "Delete Settings", method: nil},
-      {id: 6, value: "6", prompt: "Order a product", method: -> do order_product end},
-      {id: 7, value: "7", prompt: "View all orders", method: -> do show_all_orders end},
-      {id: 8, value: "signup", prompt: "Sign up (create a user)", method: -> do signup end},
-      {id: 9, value: "login", prompt: "Log in (create a jwt)", method: -> do login end},
-      {id: 10, value: "logout", prompt: "Log out (destroy the jwt)", method: -> do logout end},
-      {id: 11, value: "q", prompt: "Quit", method: -> do quit end}
+      {id: 10, value: "1", prompt: "Show all products", method: -> do show_all_products end},
+      {id: 11, value: "1.1", prompt: "\tShow all products that match search terms", method: -> do show_all_products_search end},
+      {id: 12, value: "1.2", prompt: "\tShow all products sorted by price", method: -> do show_all_products_sorted_by_price end},
+      {id: 20, value: "2", prompt: "Create Settings", method: nil},
+      {id: 30, value: "3", prompt: "Show one product", method: -> do show_one_product end},
+      {id: 40, value: "4", prompt: "Update Settings", method: nil},
+      {id: 50, value: "5", prompt: "Delete Settings", method: nil},
+      {id: 60, value: "6", prompt: "Order a product", method: -> do order_product end},
+      {id: 70, value: "7", prompt: "View all orders", method: -> do show_all_orders end},
+      {id: 80, value: "signup", prompt: "Sign up (create a user)", method: -> do signup end},
+      {id: 90, value: "login", prompt: "Log in (create a jwt)", method: -> do login end},
+      {id: 100, value: "logout", prompt: "Log out (destroy the jwt)", method: -> do logout end},
+      {id: 110, value: "q", prompt: "Quit", method: -> do quit end}
     ]
+    @admin_user = false
     @quit_temp = false
     @user_email = ""
   end
@@ -37,7 +38,8 @@ class User
   def show_menu
     system "clear"
     puts "Choose an option:"
-    @menu_options.each do |menu_option|
+    options = @menu_options.sort_by(&:values)
+    options.each do |menu_option|
       puts "[#{menu_option[:value]}] #{menu_option[:prompt]}"
     end
   end
@@ -135,6 +137,7 @@ class User
 
   def logout
     @jwt = ""
+    @admin_user = false
     Unirest.clear_default_headers()
     puts "Logged out successfully!"
   end
@@ -156,6 +159,7 @@ class User
           response = Unirest.get("http://localhost:3000/v1/users?search_user_email=#{@user_email}")
           user = response.body
           if user[0]["admin"]
+            @admin_user = true
             break
           end
         end
@@ -172,21 +176,21 @@ class Admin < User
 
   def initialize
     super
-    @menu_options << {id: 1.3, value: "1.3", prompt: "Show one User", method: -> do show_one_user end}
-    @menu_options << {id: 1.4, value: "1.4", prompt: "Show all Users", method: -> do show_all_users end}
-    @menu_options << {id: 1.5, value: "1.5", prompt: "Show all Users that match search terms", method: -> do show_all_users_search end}
-    @menu_options << {id: 1.6, value: "1.6", prompt: "Show all Users sorted by their join date", method: -> do show_all_users_sorted_by_created end}
-    @menu_options << {id: 2.1, value: "2.1", prompt: "Create a supplier", method: -> do create_supplier end}
-    @menu_options << {id: 2.2, value: "2.2", prompt: "Create a product", method: -> do create_product end}
-    @menu_options << {id: 2.3, value: "2.3", prompt: "Create a Image for product", method: -> do create_image end}
-    @menu_options << {id: 4.1, value: "4.1", prompt: "Update a supplier", method: -> do update_supplier end}
-    @menu_options << {id: 4.2, value: "4.2", prompt: "Update a product", method: -> do update_product end}
-    @menu_options << {id: 4.3, value: "4.3", prompt: "Update a image", method: -> do update_image end}
-    @menu_options << {id: 4.4, value: "4.4", prompt: "Update a user", method: -> do update_user end}
-    @menu_options << {id: 5.1, value: "5.1", prompt: "Delete a supplier", method: -> do delete_supplier end}
-    @menu_options << {id: 5.2, value: "5.2", prompt: "Delete a product", method: -> do delete_product end}
-    @menu_options << {id: 5.3, value: "5.3", prompt: "Delete a image", method: -> do delete_image end}
-    @menu_options << {id: 5.4, value: "5.4", prompt: "Delete a user", method: -> do delete_user end}
+    @menu_options << {id: 13, value: "1.3", prompt: "**Show one User", method: -> do show_one_user end}
+    @menu_options << {id: 14, value: "1.4", prompt: "**Show all Users", method: -> do show_all_users end}
+    @menu_options << {id: 15, value: "1.5", prompt: "**Show all Users that match search terms", method: -> do show_all_users_search end}
+    @menu_options << {id: 16, value: "1.6", prompt: "**Show all Users sorted by their join date", method: -> do show_all_users_sorted_by_created end}
+    @menu_options << {id: 21, value: "2.1", prompt: "**Create a supplier", method: -> do create_supplier end}
+    @menu_options << {id: 22, value: "2.2", prompt: "**Create a product", method: -> do create_product end}
+    @menu_options << {id: 23, value: "2.3", prompt: "**Create a Image for product", method: -> do create_image end}
+    @menu_options << {id: 41, value: "4.1", prompt: "**Update a supplier", method: -> do update_supplier end}
+    @menu_options << {id: 42, value: "4.2", prompt: "**Update a product", method: -> do update_product end}
+    @menu_options << {id: 43, value: "4.3", prompt: "**Update a image", method: -> do update_image end}
+    @menu_options << {id: 44, value: "4.4", prompt: "**Update a user", method: -> do update_user end}
+    @menu_options << {id: 51, value: "5.1", prompt: "**Delete a supplier", method: -> do delete_supplier end}
+    @menu_options << {id: 52, value: "5.2", prompt: "**Delete a product", method: -> do delete_product end}
+    @menu_options << {id: 53, value: "5.3", prompt: "**Delete a image", method: -> do delete_image end}
+    @menu_options << {id: 54, value: "5.4", prompt: "**Delete a user", method: -> do delete_user end}
   end
 
   def create_supplier
@@ -383,7 +387,11 @@ end
 
 user = User.new
 admin = Admin.new
+user.run()
 unless user.quit_temp
-  user.run()
-  admin.run()
+  if user.admin_user
+    admin.run()
+  else
+    user.run()
+  end
 end
