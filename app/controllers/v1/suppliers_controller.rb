@@ -1,4 +1,6 @@
 class V1::SuppliersController < ApplicationController
+  before_action :authenticate_admin, except: [:index, :show]
+  
   def index
     supplier = Supplier.all.order(:id)
     if params[:search_name]

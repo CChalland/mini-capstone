@@ -5,6 +5,7 @@ class User
   attr_reader :admin_user, :quit_temp
 
   def initialize
+    @base_url = "http://localhost:3000"
     @jwt = ""
     @menu_options = [
       {id: 10, value: "1", prompt: "Show all products", method: -> do show_all_products end},
@@ -15,7 +16,8 @@ class User
       {id: 30, value: "3", prompt: "Update Settings", method: nil},
       {id: 40, value: "4", prompt: "Delete Settings", method: nil},
       {id: 50, value: "5", prompt: "Order a product", method: -> do order_product end},
-      {id: 60, value: "6", prompt: "View all orders", method: -> do show_all_orders end},
+      {id: 51, value: "5.1", prompt: "\tRemove Carted Products", method: -> do change_carted_product_status end},
+      {id: 52, value: "5.2", prompt: "\tPlace Order for Carted Products", method: -> do place_order end},
       {id: 70, value: "signup", prompt: "Sign up (create a user)", method: -> do signup end},
       {id: 80, value: "login", prompt: "Log in (create a jwt)", method: -> do login end},
       {id: 90, value: "logout", prompt: "Log out (destroy the jwt)", method: -> do logout end},
@@ -45,7 +47,7 @@ class User
   end
 
   def show_all_products
-    response = Unirest.get("http://localhost:3000/v1/products")
+    response = Unirest.get("#{@base_url}/v1/products")
     products = response.body
     pp products
   end
@@ -53,13 +55,13 @@ class User
   def show_all_products_search
     print "Enter search terms: "
     input_search_terms = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/products?search_name=#{input_search_terms}")
+    response = Unirest.get("#{@base_url}/v1/products?search_name=#{input_search_terms}")
     products = response.body
     pp products
   end
 
   def show_all_products_sorted_by_price
-    response = Unirest.get("http://localhost:3000/v1/products?search_price=true")
+    response = Unirest.get("#{@base_url}/v1/products?search_price=true")
     products = response.body
     pp products
   end
@@ -67,7 +69,7 @@ class User
   def show_one_product
     print "Enter a product id: "
     product_id = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/products/#{product_id}")
+    response = Unirest.get("#{@base_url}/v1/products/#{product_id}")
     product = response.body
     pp product
   end
@@ -78,7 +80,7 @@ class User
     params[:input_product_id] = gets.chomp
     print "Quantity: "
     params[:input_quantity] = gets.chomp
-    response = Unirest.post("http://localhost:3000/v1/orders", parameters: params)
+    response = Unirest.post("#{@base_url}/v1/carted_products", parameters: params)
     order = response.body
     if order["errors"]
       puts "No good!"
@@ -89,10 +91,19 @@ class User
     end
   end
 
-  def show_all_orders
-    response = Unirest.get("http://localhost:3000/v1/orders")
-    orders = response.body
-    pp orders
+  def place_order
+    puts "Will you like to place an order on your carted products? (yes)"
+    puts "Input 'no' to remove your carted products."
+    response = Unirest.post("#{@base_url}/v1/orders")
+    order = response.body
+    pp order    
+  end
+
+  def change_carted_product_status
+    print "Enter Carted Product id: "
+    carted_product_id = gets.chomp
+    response = Unirest.delete("#{@base_url}/v1/carted_products/#{carted_product_id}")
+    pp response.body
   end
 
   def signup
@@ -105,7 +116,7 @@ class User
     print "Confirm password: "
     input_password_confirmation = gets.chomp
     response = Unirest.post(
-      "http://localhost:3000/v1/users",
+      "#{@base_url}/v1/users",
       parameters: {
         user_name: input_name,
         email: input_email,
@@ -122,7 +133,7 @@ class User
     print "Enter password: "
     input_password = gets.chomp
     response = Unirest.post(
-      "http://localhost:3000/user_token",
+      "#{@base_url}/user_token",
       parameters: {
         auth: {
           email: @user_email,
@@ -139,7 +150,7 @@ class User
     @jwt = ""
     @admin_user = false
     Unirest.clear_default_headers()
-    puts "Logged out successfully!"
+    puts "Logged out successfully!"  
   end
 
   def quit
@@ -156,7 +167,7 @@ class User
       if menu_option
         menu_option[:method].call
         if input_option == "login"
-          response = Unirest.get("http://localhost:3000/v1/users?search_user_email=#{@user_email}")
+          response = Unirest.get("#{@base_url}/v1/users?search_user_email=#{@user_email}")
           user = response.body
           if user[0]["admin"]
             @admin_user = true
@@ -191,6 +202,8 @@ class Admin < User
     @menu_options << {id: 42, value: "4.2", prompt: "**Delete a product", method: -> do delete_product end}
     @menu_options << {id: 43, value: "4.3", prompt: "**Delete a image", method: -> do delete_image end}
     @menu_options << {id: 44, value: "4.4", prompt: "**Delete a user", method: -> do delete_user end}
+    @menu_options << {id: 53, value: "5.3", prompt: "**View all orders", method: -> do show_all_orders end}
+
   end
 
   def create_supplier
@@ -201,7 +214,7 @@ class Admin < User
     params[:email] = gets.chomp
     print "New supplier phone number: "
     params[:phone_number] = gets.chomp
-    response = Unirest.post("http://localhost:3000/v1/suppliers", parameters: params)
+    response = Unirest.post("#{@base_url}/v1/suppliers", parameters: params)
     supplier = response.body
     if supplier["errors"]
       puts "No good!"
@@ -222,7 +235,7 @@ class Admin < User
     params[:description] = gets.chomp
     print "New product supplier_id: "
     params[:supplier_id] = gets.chomp
-    response = Unirest.post("http://localhost:3000/v1/products", parameters: params)
+    response = Unirest.post("#{@base_url}/v1/products", parameters: params)
     product = response.body
     if product["errors"]
       puts "No good!"
@@ -240,7 +253,7 @@ class Admin < User
     params[:url] = gets.chomp
     print "Enter image's product_id:"
     params[:product_id] = gets.chomp
-    response = Unirest.post("http://localhost:3000/v1/images", parameters: params)
+    response = Unirest.post("#{@base_url}/v1/images", parameters: params)
     image = response.body
     if image["errors"]
       puts "No good!"
@@ -252,7 +265,7 @@ class Admin < User
   end
 
   def show_all_users
-    response = Unirest.get("http://localhost:3000/v1/users")
+    response = Unirest.get("#{@base_url}/v1/users")
     products = response.body
     pp products
   end
@@ -260,13 +273,13 @@ class Admin < User
   def show_all_users_search
     print "Enter search terms: "
     input_search_terms = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/users?search_user_name=#{input_search_terms}")
+    response = Unirest.get("#{@base_url}/v1/users?search_user_name=#{input_search_terms}")
     products = response.body
     pp products
   end
 
   def show_all_users_sorted_by_created
-    response = Unirest.get("http://localhost:3000/v1/users?search_user_created=true")
+    response = Unirest.get("#{@base_url}/v1/users?search_user_created=true")
     products = response.body
     pp products
   end
@@ -274,7 +287,7 @@ class Admin < User
   def show_one_user
     print "Enter a user id: "
     user_id = gets.chomp.to_i
-    response = Unirest.get("http://localhost:3000/v1/users/#{user_id}")
+    response = Unirest.get("#{@base_url}/v1/users/#{user_id}")
     product = response.body
     pp product
   end
@@ -282,7 +295,7 @@ class Admin < User
   def update_supplier
     print "Enter a supplier id: "
     supplier_id = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/suppliers/#{supplier_id}")
+    response = Unirest.get("#{@base_url}/v1/suppliers/#{supplier_id}")
     supplier = response.body
     params = {}
     print "New supplier name (#{supplier[:name]}): "
@@ -292,7 +305,7 @@ class Admin < User
     print "New supplier phone number (#{supplier[:phone_number]}): "
     params[:phone_number] = gets.chomp
     params.delete_if { |_key, value| value.empty? }
-    response = Unirest.patch("http://localhost:3000/v1/suppliers/#{supplier_id}", parameters: params)
+    response = Unirest.patch("#{@base_url}/v1/suppliers/#{supplier_id}", parameters: params)
     product = response.body
     pp response.body
   end
@@ -300,7 +313,7 @@ class Admin < User
   def update_product
     print "Enter a product id: "
     product_id = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/products/#{product_id}")
+    response = Unirest.get("#{@base_url}/v1/products/#{product_id}")
     product = response.body
     params = {}
     print "Updated product name (#{product[:name]}): "
@@ -314,7 +327,7 @@ class Admin < User
     print "Updated product availability(#{product[:availability]}): "
     gets.chomp == "false" ? params[:availability] = false : true
     params.delete_if { |_key, value| value.empty? }
-    response = Unirest.patch("http://localhost:3000/v1/products/#{product_id}", parameters: params)
+    response = Unirest.patch("#{@base_url}/v1/products/#{product_id}", parameters: params)
     product = response.body
     pp response.body
   end
@@ -322,7 +335,7 @@ class Admin < User
   def update_image
     print "Enter the image id: "
     image_id = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/images/#{image_id}")
+    response = Unirest.get("#{@base_url}/v1/images/#{image_id}")
     product = response.body
     params = {}
     print "Updated product image (#{image[:url]}): "
@@ -331,7 +344,7 @@ class Admin < User
     params[:product_id] = gets.chomp
     print "Updated product description (#{product[:description]}): "
     params.delete_if { |_key, value| value.empty? }
-    response = Unirest.patch("http://localhost:3000/v1/images/#{image_id}", parameters: params)
+    response = Unirest.patch("#{@base_url}/v1/images/#{image_id}", parameters: params)
     product = response.body
     pp response.body
   end
@@ -339,7 +352,7 @@ class Admin < User
   def update_user
     print "Enter the user id: "
     user_id = gets.chomp
-    response = Unirest.get("http://localhost:3000/v1/users/#{user_id}")
+    response = Unirest.get("#{@base_url}/v1/users/#{user_id}")
     user = response.body
     params = {}
     print "Update username (#{user[:user_name]}): "
@@ -351,7 +364,7 @@ class Admin < User
     print "Change password confirmation: "
     params[:password_confirmation] = gets.chomp
     params.delete_if { |_key, value| value.empty? }
-    response = Unirest.patch("http://localhost:3000/v1/users/#{user_id}", parameters: params)
+    response = Unirest.patch("#{@base_url}/v1/users/#{user_id}", parameters: params)
     user = response.body
     pp response.body
   end
@@ -359,36 +372,43 @@ class Admin < User
   def delete_supplier
     print "Enter a supplier id: "
     supplier_id = gets.chomp
-    response = Unirest.delete("http://localhost:3000/v1/suppliers/#{supplier_id}")
+    response = Unirest.delete("#{@base_url}/v1/suppliers/#{supplier_id}")
     pp response.body
   end
 
   def delete_product
     print "Enter a product id: "
     product_id = gets.chomp
-    response = Unirest.delete("http://localhost:3000/v1/products/#{product_id}")
+    response = Unirest.delete("#{@base_url}/v1/products/#{product_id}")
     pp response.body
   end
 
   def delete_image
     print "Enter a image id: "
     image_id = gets.chomp
-    response = Unirest.delete("http://localhost:3000/v1/images/#{image_id}")
+    response = Unirest.delete("#{@base_url}/v1/images/#{image_id}")
     pp response.body
   end
 
   def delete_user
     print "Enter a user id: "
     user_id = gets.chomp
-    response = Unirest.delete("http://localhost:3000/v1/users/#{user_id}")
+    response = Unirest.delete("#{@base_url}/v1/users/#{user_id}")
     pp response.body
   end
+
+  def show_all_orders
+    response = Unirest.get("#{@base_url}/v1/carted_products")
+    orders = response.body
+    pp orders
+  end
 end
+
 
 user = User.new
 admin = Admin.new
 user.run()
-unless user.quit_temp
+while !user.quit_temp
   if user.admin_user
     admin.run()
   else

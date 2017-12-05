@@ -4,17 +4,24 @@ class Product < ApplicationRecord
   validates :price, numericality: {greater_than: 0}
   validates :description, length: {in: 5..500} 
   
+  has_many :carted_products
   has_many :category_products
-  has_many :orders
   belongs_to :supplier
   # def supplier
   #   Supplier.find_by(id: supplier_id)
   # end
   has_many :images
   # def images
-  #   Image.find_by(id: self.image_id)
+  #   Image.where(product_id: id)
   # end
+  has_many :orders
+
   has_many :categories, through: :category_products
+  # def categories
+  #   category_products.map {|category_product| category_product.category}
+# end
+
+
   def categories
     category_products.map {|category_product| category_product.category}
   end
