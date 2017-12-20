@@ -40,7 +40,7 @@ urls = [
   "https://images.purehockey.com/img.aspx?itm_id=26681&div_id=41&pic_type=5&mtx_id=0",
   "https://images.purehockey.com/img.aspx?pic_id=96099&pic_type=5",
   "https://images.purehockey.com/img.aspx?pic_id=107935&pic_type=5",
-  "https://www.purehockey.com/product/Supreme_1S_Hockey_Gloves_-_2017/itm/26731-41/?mtx_id=0",
+  "https://images.purehockey.com/img.aspx?itm_id=26731&div_id=41&pic_type=5&mtx_id=0",
   "https://images.purehockey.com/img.aspx?itm_id=26713&div_id=41&pic_type=5&mtx_id=0",
   "https://images.purehockey.com/img.aspx?itm_id=26707&div_id=41&pic_type=5&mtx_id=0"
   ]

@@ -20,7 +20,7 @@ class V1::ProductsController < ApplicationController
       name: params[:name], 
       price: params[:price].to_f,
       description: params[:description],
-      supplier_id: params[:supplier_id].to_i,
+      supplier_id: params[:supplierId].to_i,
       availability: true
     )
     if product.save
