@@ -5,7 +5,9 @@ var HomePage = {
   data: function() {
     return {
       message: "Welcome to Products",
-      products: []
+      products: [],
+      searchProducts: "",
+      searchDecsription: ""
     };
   },
   mounted: function() {
@@ -15,7 +17,16 @@ var HomePage = {
       }.bind(this)
     );
   },
-  methods: {},
+  methods: {
+    isValidSearch: function(input) {
+      var nameSearch = input.name.toLowerCase().includes(this.searchProducts);
+      var descriptionSearch = input.description
+        .toLowerCase()
+        .includes(this.searchDecsription);
+
+      return nameSearch && descriptionSearch;
+    }
+  },
   computed: {}
 };
 
@@ -53,6 +64,7 @@ var ProductsNewPage = {
       errors: []
     };
   },
+  mounted: function() {},
   methods: {
     submit: function() {
       var params = {
@@ -87,6 +99,7 @@ var ProductsUpdatePage = {
       errors: []
     };
   },
+  mounted: function() {},
   methods: {
     submit: function() {
       var params = {

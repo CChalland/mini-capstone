@@ -63,8 +63,21 @@
 <template id="home-page">
   <div class="container">
     <h1 class="text-white">All Products</h1>
+    <div class="">
+      <div class="dropdown">
+        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Product's Filter
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+          <input type="text" v-model="searchProducts" placeholder="Enter Product's Name">
+          <input type="text" v-model="searchDecsription" placeholder="Enter Product's Description">
+        </div>
+      </div>
+      <br>
+    </div>
+
     <div class="row">
-      <div class="col-md-4" v-for="product in products">
+      <div class="col-md-4" v-for="product in products" v-if="isValidSearch(product)">
         <div class="card mb-2">
           <img class="card-img-top" v-bind:src="product.image" alt="Card image cap">
           <div class="card-body">
