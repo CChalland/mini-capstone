@@ -7,13 +7,15 @@ var HomePage = {
       message: "Welcome to Products",
       products: [],
       searchProducts: "",
-      searchDecsription: ""
+      searchDecsription: "",
+      sortAttribute: ""
     };
   },
   mounted: function() {
     axios.get("/v1/products").then(
       function(response) {
         this.products = response.data;
+        console.log(this.products);
       }.bind(this)
     );
   },
@@ -25,9 +27,20 @@ var HomePage = {
         .includes(this.searchDecsription);
 
       return nameSearch && descriptionSearch;
+    },
+    changeSort: function(inputAttribute) {
+      this.sortAttribute = inputAttribute;
     }
   },
-  computed: {}
+  computed: {
+    sortedProducts: function() {
+      return this.products.sort(
+        function(product1, product2) {
+          return product1[this.sortAttribute] > product2[this.sortAttribute];
+        }.bind(this)
+      );
+    }
+  }
 };
 
 var ProductsShowPage = {

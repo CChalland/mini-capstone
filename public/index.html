@@ -7,6 +7,7 @@
   <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js" integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh" crossorigin="anonymous"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js" integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ" crossorigin="anonymous"></script>
+  <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
   <script src="https://unpkg.com/vue/dist/vue.min.js"></script>
   <script src="https://unpkg.com/vue-router/dist/vue-router.min.js"></script>
@@ -63,21 +64,30 @@
 <template id="home-page">
   <div class="container">
     <h1 class="text-white">All Products</h1>
-    <div class="">
+    <div class="text-center">
       <div class="dropdown">
         <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
           Product's Filter
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-          <input type="text" v-model="searchProducts" placeholder="Enter Product's Name">
+          <input type="text" v-model="searchProducts" placeholder="Enter Product's Name" list="names">
+          <datalist id="names">
+            <option v-for="product in products">{{ product.name }}</option>
+          </datalist>
           <input type="text" v-model="searchDecsription" placeholder="Enter Product's Description">
         </div>
       </div>
-      <br>
     </div>
 
-    <div class="row">
-      <div class="col-md-4" v-for="product in products" v-if="isValidSearch(product)">
+    <div>
+      <button class="btn btn-secondary fa fa-sort" v-on:click="changeSort('name')">Sort by Product's Name</button>
+      <button class="btn btn-secondary fa fa-sort" v-on:click="changeSort('price')">Sort by Product's Price</button>
+    </div>
+    <br>
+
+    <div class="row shake animated" is="transition-group" name="fade">
+      
+      <div class="col-md-4" v-for="product in sortedProducts" v-if="isValidSearch(product)" v-bind:key="product.id">
         <div class="card mb-2">
           <img class="card-img-top" v-bind:src="product.image" alt="Card image cap">
           <div class="card-body">
@@ -98,9 +108,9 @@
   </div>
 </template>
 
-
+```
 <template id="products-show-page">
-  <div class="container">
+  <div class="container text-center">
     <div class="row">
       <div class="col-md-4">
         <div class="card mb-2">
@@ -118,6 +128,7 @@
     </div>
   </div>
 </template>
+```
 
 <template id="products-new-page">
   <div class="container">
